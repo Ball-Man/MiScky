@@ -1,0 +1,8 @@
+UICONTROLLER
+--------------------------------------------
+This documentation is made by Giacomo Aloisi
+--------------------------------------------
+
+UIController.py
+
+This is the main program that runs and communicate with CORE to do UI operations
