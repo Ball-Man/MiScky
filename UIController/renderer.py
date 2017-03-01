@@ -9,7 +9,7 @@ imagesFolder = fileFolder + "/Images/"
 
 #fontsFolder = "/home/mirror/MiScky/UIController/Fonts/"
 
-def getTextSurface(text, fontFile, size, color = (255,255,255), antiAliasing = 1):
+def getTextSurface(text, fontFile, size, color = (255,255,255), antiAliasing = True):
     if type(text) is not str:
         raise TypeError("The text is not a string!")
     if type(fontFile) is not str:
@@ -23,6 +23,8 @@ def getTextSurface(text, fontFile, size, color = (255,255,255), antiAliasing = 1
     for a in color:
         if a < 0 or a > 255:
             raise ValueError("The color must be from 0 to 255!")
+    if type(antiAliasing) is not bool:
+        raise TypeError("The antialiasing parameter is not a boolean!")
     if not pygame.font.get_init():
         pygame.font.init()
         print("Initialized font module pygame from renderer")
