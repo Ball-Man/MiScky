@@ -28,7 +28,7 @@ def startPrintTextDiffuse(*args, **kwargs):
 
 def printTextDiffuse(text, coordinates, timeDiffuse):
     assert(type(text) is Text)
-    assert(type(coordinates) is tuple and len(coordinates) == 2 and all(map(lambda(x): type(x) is int, coordinates)))
+    assert(type(coordinates) is tuple and len(coordinates) == 2 and all(map(lambda x: type(x) is int, coordinates)))
     assert(type(timeDiffuse) is int or type(timeDiffuse) is float)
 
     surface = text.render()
@@ -54,7 +54,7 @@ def startPrintTextRunning(*args, **kwargs):
 
 def printTextRunning(text, coordinates, timeRunning): 
     assert(type(text) is Text)
-    assert(type(coordinates) is tuple and len(coordinates) == 2 and all(map(lambda(x): type(x) is int, coordinates)))
+    assert(type(coordinates) is tuple and len(coordinates) == 2 and all(map(lambda x: type(x) is int, coordinates)))
     assert(type(timeRunning) is int or type(timeRunning) is float)
         
     atomTime = timeRunning / len(text.text)
@@ -71,6 +71,6 @@ def printTextRunning(text, coordinates, timeRunning):
             time.sleep(atomTime)
 
 def addModule():
-
+	pass
 def refresh():
-
+	pass
