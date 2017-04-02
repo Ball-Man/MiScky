@@ -7,6 +7,7 @@ import threading
 import string
 
 from .types import *
+from .modules import *
 
 '''
 import Xlib
@@ -26,14 +27,9 @@ def startPrintTextDiffuse(*args, **kwargs):
     return thread
 
 def printTextDiffuse(text, coordinates, timeDiffuse):
-    if type(text) is not Text:
-        raise TypeError("The text is not a Text!")
-    if type(coordinates) is not tuple:
-        raise TypeError("The coordinates are not a tuple!")
-    if len(coordinates) != 2:
-        raise ValueError("The coordinates are not 2!")
-    if type(timeDiffuse) is not int and type(timeDiffuse) is not float:
-        raise TypeError("The timeDiffuse is not an integer or a float!")
+    assert(type(text) is Text)
+    assert(type(coordinates) is tuple and len(coordinates) == 2 and all(map(lambda(x): type(x) is int, coordinates)))
+    assert(type(timeDiffuse) is int or type(timeDiffuse) is float)
 
     surface = text.render()
     background = pygame.Surface((surface.get_width(), surface.get_height()))
@@ -56,16 +52,11 @@ def startPrintTextRunning(*args, **kwargs):
     thread.start()
     return thread
 
-def printTextRunning(text, timeRunning, coordinates):
-    if type(text) is not Text:
-        raise TypeError("The text is not a Text!")
-    if type(coordinates) is not tuple:
-        raise TypeError("The coordinates are not a tuple!")
-    if len(coordinates) != 2:
-        raise ValueError("The coordinates are not 2!")
-    if type(timeRunning) is not int and type(timeRunning) is not float:
-        raise TypeError("The timeRunning is not an integer or a float!")
-
+def printTextRunning(text, coordinates, timeRunning): 
+    assert(type(text) is Text)
+    assert(type(coordinates) is tuple and len(coordinates) == 2 and all(map(lambda(x): type(x) is int, coordinates)))
+    assert(type(timeRunning) is int or type(timeRunning) is float)
+        
     atomTime = timeRunning / len(text.text)
     tmpText = text.text
     text.text = ""
@@ -78,3 +69,8 @@ def printTextRunning(text, timeRunning, coordinates):
             surface.fill((0,0,0))
             screen.blit(surface, coordinates)
             time.sleep(atomTime)
+
+def addModule():
+
+def refresh():
+
