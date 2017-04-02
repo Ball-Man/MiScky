@@ -1,19 +1,23 @@
 import UIController as uic
-from UIController.types import Text
+from UIController.types import Text, Rectangle
+import UIController.colors as colors
+from UIController.modules import *
+import pygame
 
 import time
 
 uic.init()
 
-WHITE = (255,255,255)
+uic.screen.fill(colors.BLACK)
+surf = CalendarModule((500,500), events=('fuffa','pippo')).render() 
+uic.screen.blit(surf, (100, 100))
+pygame.display.flip()
 
-text1 = Text("Ciao", 50, WHITE)
-text2 = Text("come stai?", 50, WHITE)
-
-thread = uic.startPrintTextDiffuse(text1, (100,100), 1)
-thread.join()
-thread = uic.startPrintTextRunning(text2, 1, (200,200))
-thread.join()
-
-time.sleep(5)
+stop = False
+while not stop:
+	for e in pygame.event.get():
+		if e.type == pygame.KEYDOWN:
+			stop = True
+			break
+	time.sleep(0.1)
 pygame.quit()
