@@ -1,0 +1,3 @@
+**/__pycache__/*
+GoogleAPI/.credentials/*
+GoogleAPI/client_secret.json
