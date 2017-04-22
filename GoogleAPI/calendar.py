@@ -20,11 +20,10 @@ class Event:
 		summary = dictionary.get('summary', '[No title]')
 		return Event(date, summary)
 
-def get_events(count):
+def get_events(count : int = 10000, timeMax : datetime.datetime = datetime.datetime.utcnow()+datetime.timedelta(days=3650)):
 	service = authorize(API_NAME, API_VERSION)
 	now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-	eventsResult = service.events().list(
-		calendarId='primary', timeMin=now, maxResults=count, singleEvents=True,
-		orderBy='startTime').execute()
+	timeMax_string = timeMax.isoformat() + 'Z'
+	eventsResult = service.events().list(calendarId='primary', timeMin=now, timeMax=timeMax_string, maxResults=count, singleEvents=True, orderBy='startTime').execute()
 	events = eventsResult.get('items', [])
 	return list(map(Event.from_api_dict, events))
