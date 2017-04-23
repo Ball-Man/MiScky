@@ -9,9 +9,9 @@ for e in events:
 	print('\t' + str(e))
 
 import GoogleAPI.gmail as gm
-count = 10
-mails = gm.get_unread(count=count)
+count = 5
+mails = gm.get_unread(count=count, query='is:starred')
 
-print('First {} unread emails:'.format(count))
+print('First {} unread/starred emails:'.format(count))
 for m in mails:
-	print('\t' + m)
+	print(m)
