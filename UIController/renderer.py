@@ -28,10 +28,10 @@ def getTextSurface(text, fontFile, size, color = (255,255,255), antiAliasing = T
 def getImageSurface(imageFile):
     assert(type(imageFile) is str)
 
-    image = pygame.image.load(fileFolder + imageFile)
+    image = pygame.image.load(imagesFolder + imageFile)
     return image
 
-def scaleImage(image, dimensions):
+def scaleSurface(image, dimensions):
     assert(type(image) is pygame.Surface)
     assert(type(dimensions) is tuple and len(dimensions) == 2 and all(map(lambda x: type(x) is int, dimensions)))
 

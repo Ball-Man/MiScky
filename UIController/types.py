@@ -1,4 +1,4 @@
-from .renderer import getTextSurface
+from .renderer import *
 from .colors import *
 import pygame
 import pygame.gfxdraw
@@ -37,3 +37,13 @@ class Rectangle(pygame.Rect):
 		pygame.draw.rect(surface, color, (0,r,x,y-2*r))
 		pygame.draw.rect(surface, color, (r,y-r,x-2*r,r))
 		return surface
+
+class Image:
+	def __init__(self, size, source):
+		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
+		assert(type(source) is str)
+		self.size = size
+		self.source = source
+	def render(self):
+		surf = scaleSurface(getImageSurface(self.source), self.size)
+		return surf
