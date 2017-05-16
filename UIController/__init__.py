@@ -8,11 +8,15 @@ import string
 
 from .types import *
 from .modules import *
+from .renderer import *
+from .colors import *
 
 '''
 import Xlib
 Xlib.InitThreads()
 '''
+
+modules = []
 
 def init():
     global screen
@@ -70,7 +74,20 @@ def printTextRunning(text, coordinates, timeRunning):
             screen.blit(surface, coordinates)
             time.sleep(atomTime)
 
-def addModule():
-	pass
+def addModule(moduleType, dimensions, events, position):
+	if moduleType == 'Calendar':
+		modules.append((CalendarModule(dimensions, events), position))
+	elif moduleType == 'Meteo':
+		modules.append((MeteoModule(dimensions, events), position))
+	elif moduleType == 'Mail':
+		modules.append((MailModule(dimensions, events), position))
+	elif moduleType == 'Clock':
+		modules.append((ClockModule(dimensions, events), position))
+	else:
+		pass
+
 def refresh():
-	pass
+	screen.fill(BLACK)
+	for mod in modules:
+		screen.blit(mod[0].render(), mod[1])
+	pygame.display.flip()
