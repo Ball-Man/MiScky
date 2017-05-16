@@ -15,5 +15,5 @@ def tts(text, getpath):
 			for chunk in r.iter_content(chunk_size=128):
 				fd.write(chunk)
 		return path+'.'+codec
-	return r
+	return r.content
 	
