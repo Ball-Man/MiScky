@@ -12,9 +12,11 @@ def loop():
 	global current
 	
 	while queue:
-		if not songs.empty() and not audiocontroller.playing():
+		if audiocontroller.paused:
+			audiocontroller.unpauseChannel()
+		if not songs.empty() and not audiocontroller.playingChannel():
 			current = songs.get()
-			audiocontroller.playAudio(current)
+			audiocontroller.playChannel(getRawFromFile(current))
 
 def addToQueue(path):
 	global songs
@@ -32,7 +34,7 @@ def popFromQueue():
 	
 	songs.get()
 
-#call ONCE to start queuing(Extremely blocking)
+#call ONCE to start queuing
 def playQueue():
 	global started
 	global queue
@@ -46,23 +48,14 @@ def stopQueue():
 	global queue
 	
 	queue = False
-	if audiocontroller.playing():
-		audiocontroller.stop()
+	if audiocontroller.playingChannel():
+		audiocontroller.pauseChannel()
 
-#execute on secondary thread(Extremely blocking)		
-def playWithPriority(path):
-	global queue
-	
-	queue = False
-	
-	audiocontroller.pauseNonPriority()
-	audiocontroller.playAudio(path)
-	while audiocontroller.playing:
-		pass
-	audiocontroller.unpauseNonPriority()
-	
-	queue = True
-	
-	
+def playPriority(path):
+	audiocontroller.playOver(getRawFromFile(path))
+
+def getRawFromFile(path):
+	with open(path, 'rb') as f:
+		return f.read()
 	
 	

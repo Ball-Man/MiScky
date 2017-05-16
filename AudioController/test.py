@@ -6,10 +6,9 @@ import time
 
 audiocontroller.init()
 
-mixer.addToQueue('output.WAV')
-
+mixer.addToQueue('prova1.WAV')
+mixer.addToQueue('prova2.WAV')
 mixer.playQueue()
 
-time.sleep(0.5)
-while audiocontroller.playing():
-	print('Doing things')
+while True:
+	print('PLAYINNNNG')

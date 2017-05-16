@@ -1,48 +1,54 @@
 from pygame import mixer
+import time
 
-current = ''
-paused = ''
-paused_time = 0.0
+channel = None
+paused = False 
 
 def init():
-	mixer.init(16000, 16, 2, 1048)
-	
-def playAudio(path):
-	global current
-	
-	if mixer.music.get_busy():
-		return
-	current = path
-	mixer.music.load(path)
-	mixer.music.play()
-	
-def stop():
-	mixer.music.stop()
-	
-def playing():
-	return mixer.music.get_busy()
+	global channel
 
-def pauseNonPriority():
+	mixer.init(16000, -16, 1, 2048)
+	channel = mixer.Channel(1)
+
+def playChannel(raw):
+	channel.set_volume(0)
+	channel.play(mixer.Sound(raw))
+	time.sleep(0.2)
+	channel.set_volume(1)
+	
+def stopChannel():
+	channel.stop()
+	
+def playingChannel():
+	return channel.get_busy()
+
+def stop():
+	return mixer.stop()
+
+def playing():
+	return mixer.get_busy()
+
+def pauseChannel():
 	global paused
-	global paused_time
-	
-	paused_time = mixer.music.get_pos/1000
-	paused = current
-	mixer.music.fadeout(300)
-	
-def unpauseNonPriority():
+
+	paused = True
+	channel.pause()
+
+def unpauseChannel():
 	global paused
-	global paused_time
-	
-	mixer.music.load(paused)
-	mixer.music.set_volume(0.0)
-	mixer.music.play(start=paused_time)
-	
-	tmp = 0.0
-	while tmp < 1:
-		tmp += 0.001
-		mixer.music.set_volume(tmp)
-	
-	paused = ''
-	paused_time = 0.0
-	
+
+	paused = False
+	channel.unpause()
+
+def setChannelVolume(volume):
+	channel.set_volume(volume)
+
+def getChannelVolume():
+	return channel.get_volume()
+
+def playOver(raw):
+	sound = mixer.Sound(raw)
+	sound.set_volume(0)
+	sound.play()
+	time.sleep(0.2)
+	sound.set_volume(1)
