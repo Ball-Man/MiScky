@@ -5,7 +5,7 @@ paused = ''
 paused_time = 0.0
 
 def init():
-	mixer.init()
+	mixer.init(16000, 16, 2, 1048)
 	
 def playAudio(path):
 	global current
