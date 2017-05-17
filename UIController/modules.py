@@ -1,6 +1,7 @@
 from .types import *
 from .colors import *
 
+import math
 import datetime as dt
 
 class UIModule:
@@ -111,27 +112,27 @@ class MeteoModule(UIModule):
 		meteoFolder = 'Weather/light/png/'
 
 		imageN = '25'
-		if meteo == 'sunny':
+		if meteo == 'Clear':
 			imageN = '36'
-		elif meteo == 'rainy':
+		elif meteo == 'Rain':
 			imageN = '40'
-		elif meteo == 'foggy':
+		elif meteo == 'Fog':
 			imageN = '20'
-		elif meteo == 'cloudy':
+		elif meteo == 'Clouds':
 			imageN = '26'
-		elif meteo == 'storm':
+		elif meteo == 'Thunderstorm':
 			imageN = '35'
-		elif meteo == 'snowy':
+		elif meteo == 'Snow':
 			imageN = '14'
-		elif meteo == 'halfSunny':
+		elif meteo == 'FewClouds':
 			imageN = '28'
 		imageN += '.png'
 		imagePath = meteoFolder + imageN
-
-		tempSize = int(size[0]//6.25)
-		meteoSize = int(size[0]//2.5)
-		meteoX = size[0]//3.57
-		meteoY = size[0]//10
+		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
+		tempSize = int(scaleFactor/6.06)
+		meteoSize = int(scaleFactor/1.70)
+		meteoX = int(float(size[0])/4.61)
+		meteoY = int(float(size[1])/7.5)
 
 		temp = str(self.temperature) + '°C'
 		tempSurf = Text(temp, tempSize, METEO_BLUE).render()
@@ -142,4 +143,24 @@ class MeteoModule(UIModule):
 		background.blit(meteoSurf, (meteoX, meteoY))
 		background.blit(tempSurf, (0,0))
 
+		return background
+class ClockModule(UIModule):
+	def __init__(self, size):
+		super().__init__(size)
+	def render(self):
+		size = self.size
+		now = dt.datetime.now()
+		firstText = now.strftime('%H:%M')
+		secondText = now.strftime('%d %a %b %Y')
+		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
+		firstSize = int(scaleFactor // 2.44)
+		secondSize = int(scaleFactor // 12.2)
+		fontFile = 'Digital/DS-DIGI.TTF'
+	
+		hour = Text(firstText, firstSize, WHITE, fontFile).render()
+		second = Text(secondText, secondSize, WHITE).render()
+		
+		background = Rectangle(size[0], size[1], BLACK).render()
+		background.blit(hour, (0,0))
+		background.blit(second, (0,size[1]/1.4))
 		return background

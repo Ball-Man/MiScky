@@ -16,6 +16,8 @@ import Xlib
 Xlib.InitThreads()
 '''
 
+modules = None
+
 def init():
     global screen
     global modules
@@ -75,6 +77,8 @@ def printTextRunning(text, coordinates, timeRunning):
             time.sleep(atomTime)
 
 def addModule(moduleType, dimensions, events, position):
+	global modules
+	
 	mod = UIModule(dimensions)
 	if moduleType == 'Calendar':
 		mod = CalendarModule(dimensions, events)
@@ -83,7 +87,7 @@ def addModule(moduleType, dimensions, events, position):
 	elif moduleType == 'Mail':
 		mod = MailModule(dimensions, events)
 	elif moduleType == 'Clock':
-		mod = ClockModule(dimensions, events)
+		mod = ClockModule(dimensions)
 	else:
 		mod = UIModule(dimensions)
 		
@@ -91,6 +95,8 @@ def addModule(moduleType, dimensions, events, position):
 	return mod.ID
 
 def removeModule(ID):
+	global modules
+
 	modulesTmp = []
 	for mod in modules:
 		if mod[0].ID != ID:
