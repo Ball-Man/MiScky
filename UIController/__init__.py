@@ -102,3 +102,7 @@ def refresh():
 	for mod in modules:
 		screen.blit(mod[0].render(), mod[1])
 	pygame.display.flip()
+
+def standby():
+	screen.fill(BLACK)
+	pygame.display.flip()
