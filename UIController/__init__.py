@@ -16,10 +16,10 @@ import Xlib
 Xlib.InitThreads()
 '''
 
-modules = []
-
 def init():
     global screen
+    global modules
+    modules = []
     pygame.display.init()
     pygame.font.init()
     screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
@@ -75,16 +75,27 @@ def printTextRunning(text, coordinates, timeRunning):
             time.sleep(atomTime)
 
 def addModule(moduleType, dimensions, events, position):
+	mod = UIModule(dimensions)
 	if moduleType == 'Calendar':
-		modules.append((CalendarModule(dimensions, events), position))
+		mod = CalendarModule(dimensions, events)
 	elif moduleType == 'Meteo':
-		modules.append((MeteoModule(dimensions, events), position))
+		mod = MeteoModule(dimensions, events)
 	elif moduleType == 'Mail':
-		modules.append((MailModule(dimensions, events), position))
+		mod = MailModule(dimensions, events)
 	elif moduleType == 'Clock':
-		modules.append((ClockModule(dimensions, events), position))
+		mod = ClockModule(dimensions, events)
 	else:
-		pass
+		mod = UIModule(dimensions)
+		
+	modules.append((mod, position))
+	return mod.ID
+
+def removeModule(ID):
+	modulesTmp = []
+	for mod in modules:
+		if mod[0].ID != ID:
+			modulesTmp.append(mod)
+	modules = modulesTmp
 
 def refresh():
 	screen.fill(BLACK)

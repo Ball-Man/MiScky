@@ -7,11 +7,11 @@ class UIModule:
 	_nextId = 0
 	def __init__(self, size):
 		self.size = size
-		self.modId = UIModule._nextId
+		self.ID = UIModule._nextId
 		UIModule._nextId += 1
 	def render(self):
 		name = type(self).__name__
-		text = Text('{} with id {}'.format(name, self.modId), 20, WHITE)
+		text = Text('{} with id {}'.format(name, self.ID), 20, WHITE)
 class CalendarModule(UIModule):
 	def __init__(self, size, events):
 		super().__init__(size)
