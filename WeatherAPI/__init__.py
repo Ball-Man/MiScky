@@ -8,6 +8,17 @@ forecast = None
 city = 'San Antonio'
 last_update = datetime.datetime.fromtimestamp(0)
 
+class WeatherForecast:
+	def __init__(self, temperature, status, description):
+		self.temperature = temperature
+		self.status = status
+		self.description = description
+	def toTuple(self):
+		return str(self.temperature), self.status
+	@staticmethod
+	def fromAPI(apiobj):
+		return WeatherForecast(apiobj.get_temperature(unit='celsius'), apiobj.get_status(), apiobj.get_detailed_status())
+
 def init(place):
 	global owm
 	global city
@@ -18,11 +29,11 @@ def init(place):
 	
 def todayWeather():
 	refresh()
-	return forecast.get_weathers()[0]
+	return WeatherForecast.fromAPI(forecast.get_weathers()[0])
 
 def tomorrowWeather():
 	refresh()
-	return forecast.get_weathers()[1]
+	return WeatherForecast.fromAPI(forecast.get_weathers()[1])
 
 def refresh():
 	global forecaster
