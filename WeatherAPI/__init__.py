@@ -14,7 +14,7 @@ class WeatherForecast:
 		self.status = status
 		self.description = description
 	def toTuple(self):
-		return str(self.temperature), self.status
+		return int(self.temperature['day']), self.status
 	@staticmethod
 	def fromAPI(apiobj):
 		return WeatherForecast(apiobj.get_temperature(unit='celsius'), apiobj.get_status(), apiobj.get_detailed_status())
