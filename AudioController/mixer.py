@@ -8,6 +8,9 @@ current = ''
 started = False
 queue = False
 
+def init():
+    audiocontroller.init()
+
 def loop():
 	global current
 	

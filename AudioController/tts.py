@@ -1,4 +1,5 @@
 import requests
+import audiocontroller
 
 api_url = 'http://api.voicerss.org'
 api_key = '00a395df0b7f48efae665eac2fb49fc9'
@@ -16,4 +17,7 @@ def tts(text, getpath):
 				fd.write(chunk)
 		return path+'.'+codec
 	return r.content
-	
+
+def playTTS(text):
+	audio = tts(text, False)
+	audiocontroller.playOver(audio)
