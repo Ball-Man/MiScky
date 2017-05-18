@@ -21,7 +21,7 @@ def createCalendar():
 	moduleType = 'Calendar'
 	size = (500,700)
 	events = [x.toTuple() for x in events]
-	position = (800,50)
+	position = (500,50)
 
 	m1 = uic.addModule(moduleType, size, events, position)
 	return m1
@@ -75,16 +75,3 @@ def main():
 	pygame.quit()
 
 main()
-
-'''
-'''
-'''
-moduleType = 'Clock'
-size = (300,210)
-events = ()
-position = (50,50)
-
-m3 = uic.addModule(moduleType, size, events, position)
-
-uic.refresh()
-'''
