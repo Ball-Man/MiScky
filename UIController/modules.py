@@ -109,6 +109,7 @@ class MeteoModule(UIModule):
 		size = self.size
 		meteo = self.meteo
 		
+		fontFile = 'Digital/DS-DIGI.TTF'
 		meteoFolder = 'Weather/light/png/'
 
 		imageN = '25'
@@ -129,13 +130,13 @@ class MeteoModule(UIModule):
 		imageN += '.png'
 		imagePath = meteoFolder + imageN
 		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
-		tempSize = int(scaleFactor/6.06)
-		meteoSize = int(scaleFactor/1.70)
-		meteoX = int(float(size[0])/4.61)
-		meteoY = int(float(size[1])/7.5)
+		tempSize = int(scaleFactor/3.5)
+		meteoSize = int(scaleFactor/2)
+		meteoX = int(float(size[0])/4)
+		meteoY = int(float(size[1])/3.2)
 
-		temp = str(self.temperature) + '°C'
-		tempSurf = Text(temp, tempSize, METEO_BLUE).render()
+		temp = str(self.temperature) + ' C'
+		tempSurf = Text(temp, tempSize, METEO_BLUE, fontFile).render()
 		
 		meteoSurf = Image((meteoSize,meteoSize), imagePath).render()
 
