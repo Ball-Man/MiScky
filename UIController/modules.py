@@ -117,7 +117,7 @@ class WeatherModule(UIModule):
 			imageN = '36'
 		elif meteo == 'Rain':
 			imageN = '40'
-		elif meteo == 'Fog':
+		elif meteo == 'Atmosphere':
 			imageN = '20'
 		elif meteo == 'Clouds':
 			imageN = '26'
