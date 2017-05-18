@@ -82,8 +82,8 @@ def addModule(moduleType, dimensions, events, position):
 	mod = UIModule(dimensions)
 	if moduleType == 'Calendar':
 		mod = CalendarModule(dimensions, events)
-	elif moduleType == 'Meteo':
-		mod = MeteoModule(dimensions, events)
+	elif moduleType == 'Weather':
+		mod = WeatherModule(dimensions, events)
 	elif moduleType == 'Mail':
 		mod = MailModule(dimensions, events)
 	elif moduleType == 'Clock':

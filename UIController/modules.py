@@ -97,7 +97,7 @@ class CalendarModule(UIModule):
 				
 
 		return background
-class MeteoModule(UIModule):
+class WeatherModule(UIModule):
 	def __init__(self, size, events):
 		assert(type(size) is tuple and len(size) == 2 and size[0] == size[1])
 		assert(type(events[0]) is int)
