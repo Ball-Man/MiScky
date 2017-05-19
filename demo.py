@@ -70,7 +70,7 @@ def main():
 			if e.type == pygame.KEYDOWN:
 				stop = True
 				break
-		time.sleep(1)
+		time.sleep(5)
 
 	pygame.quit()
 
