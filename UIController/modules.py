@@ -154,7 +154,7 @@ class ClockModule(UIModule):
 		firstText = now.strftime('%H:%M')
 		secondText = now.strftime('%d %a %b %Y')
 		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
-		firstSize = int(scaleFactor // 2.44)
+		firstSize = int(scaleFactor // 3)
 		secondSize = int(scaleFactor // 12.2)
 		fontFile = 'Digital/DS-DIGI.TTF'
 	
