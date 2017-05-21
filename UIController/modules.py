@@ -146,15 +146,22 @@ class WeatherModule(UIModule):
 
 		return background
 class ClockModule(UIModule):
+	_points = True
 	def __init__(self, size):
 		super().__init__(size)
 	def render(self):
 		size = self.size
 		now = dt.datetime.now()
-		firstText = now.strftime('%H:%M')
+		s = ''
+		if ClockModule._points:
+			s = '%H:%M'
+		else:
+			s = '%H %M'
+		ClockModule._points = not ClockModule._points
+		firstText = now.strftime(s)
 		secondText = now.strftime('%d %a %b %Y')
 		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
-		firstSize = int(scaleFactor // 2.44)
+		firstSize = int(scaleFactor // 3)
 		secondSize = int(scaleFactor // 12.2)
 		fontFile = 'Digital/DS-DIGI.TTF'
 	
