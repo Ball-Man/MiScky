@@ -6,19 +6,50 @@ import datetime as dt
 
 class UIModule:
 	_nextId = 0
-	def __init__(self, size):
+	def __init__(self, size, position):
+		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
+		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
 		self.size = size
+		self.position = position
+		self.stop_updating = False
 		self.ID = UIModule._nextId
 		UIModule._nextId += 1
-	def render(self):
+	def render(self, screen):
 		name = type(self).__name__
-		text = Text('{} with id {}'.format(name, self.ID), 20, WHITE)
+		text = Text('{} with id {}'.format(name, self.ID), 10, BLACK)
+		back = Rect(self.size[0], self.size[1], WHITE)
+		background = back.render()
+		background.blit(text.render(), (0,0))
+		screen.blit(background, self.position)
+	def update(self, func):
+		pass
+	def startAutoUpdate(self, func, seconds):
+		async def autoUpdate(foo, s):
+			while not self.stop_updating:
+				self.update(foo)
+				await asyncio.sleep(s)
+		self.stop_updating = False
+		autoUpdate(func, seconds)
+	def stopAutoUpdate(self):
+		self.stop_updating = True
+	def setSize(self, size):
+		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
+		self.size = size
+	def setPosition(self, position):
+		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
+		self.position = position
 class CalendarModule(UIModule):
-	def __init__(self, size, events):
-		super().__init__(size)
-		self.events = events
-	def render(self):
+	def __init__(self, size, position):
+		super().__init__(size, position)
+		self.events = []
+	def update(self, func):
+		evs = func(5)
+		self.events = []
+		for ev in evs:
+			self.events.append(ev.toTuple())
+	def render(self, screen):
 		size = self.size
+		
 		now = dt.datetime.now()
 
 		headerH = size[1]//9
@@ -95,16 +126,18 @@ class CalendarModule(UIModule):
 				background.blit(dateNumber, (eventMargin, headerH+i*(eventH+eventMargin)+eventMargin))
 				background.blit(dateDay, (eventMargin, headerH+i*(eventH+eventMargin)+eventMargin+dateNumberH))
 				
-
-		return background
+		screen.blit(background, self.position)
 class WeatherModule(UIModule):
-	def __init__(self, size, events):
+	def __init__(self, size, position):
 		assert(type(size) is tuple and len(size) == 2 and size[0] == size[1])
-		assert(type(events[0]) is int)
-		assert(type(events[1]) is str)
-		super().__init__(size)
-		self.temperature = events[0]
-		self.meteo = events[1]
+		super().__init__(size, position)
+		self.temperature = None
+		self.meteo = None
+	def update(self, func):
+		infos = func()
+		t = infos.toTuple()
+		self.temperature = t[0]
+		self.meteo = t[1]
 	def render(self):
 		size = self.size
 		meteo = self.meteo
@@ -144,20 +177,21 @@ class WeatherModule(UIModule):
 		background.blit(meteoSurf, (meteoX, meteoY))
 		background.blit(tempSurf, (0,0))
 
-		return background
+		screen.blit(background, self.position)
 class ClockModule(UIModule):
-	_points = True
-	def __init__(self, size):
-		super().__init__(size)
-	def render(self):
+	def __init__(self, size, position):
+		super().__init__(size, position)
+		self.points = True
+	def update(self):
+		self.points = not self.points
+	def render(self, screen):
 		size = self.size
 		now = dt.datetime.now()
 		s = ''
-		if ClockModule._points:
+		if self.points:
 			s = '%H:%M'
 		else:
 			s = '%H %M'
-		ClockModule._points = not ClockModule._points
 		firstText = now.strftime(s)
 		secondText = now.strftime('%d %a %b %Y')
 		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
@@ -171,4 +205,5 @@ class ClockModule(UIModule):
 		background = Rectangle(size[0], size[1], BLACK).render()
 		background.blit(hour, (0,0))
 		background.blit(second, (0,size[1]/1.4))
-		return background
+
+		screen.blit(background, self.position)
