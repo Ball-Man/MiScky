@@ -3,6 +3,8 @@ import GoogleAPI.calendar as gcal
 import WeatherAPI as wapi
 import pygame
 import time
+import zerorpc
+from threading import Thread
 
 def waitForKey():
 	stop = False
@@ -45,9 +47,18 @@ def createClock():
 	return m3
 
 
+class RPCListener(object):
+	def refresh(self):
+		uic.refresh()
+	
 def main():
 	uic.init()
 	wapi.init('Cesena')
+	rpc = zerorpc.Server(RPCListener())
+	rpc.bind('tcp://0.0.0.0:1080')
+	
+	thread = new Thread(target = rpc.run)
+	thread.start()
 	
 	modulesID = []
 
