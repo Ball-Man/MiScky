@@ -6,7 +6,7 @@ import datetime as dt
 
 class UIModule:
 	_nextId = 0
-	def __init__(self, size, position, updateSeconds):
+	def __init__(self, size, position, updateSeconds, updateFunc):
 		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
 		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
 		self.size = size
@@ -14,6 +14,7 @@ class UIModule:
 		self.stop_updating = False
 		self.updateSeconds = updateSeconds
 		self.lastUpdate = dt.datetime.min
+		self.updateFunc = updateFunc
 		self.ID = UIModule._nextId
 		UIModule._nextId += 1
 	def render(self, screen):
@@ -33,6 +34,7 @@ class UIModule:
 		return res
 	def update(self, func):
 		pass
+	'''
 	def startAutoUpdate(self, func, seconds):
 		async def autoUpdate(foo, s):
 			while not self.stop_updating:
@@ -42,6 +44,7 @@ class UIModule:
 		autoUpdate(func, seconds)
 	def stopAutoUpdate(self):
 		self.stop_updating = True
+	'''
 	def setSize(self, size):
 		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
 		self.size = size
@@ -49,12 +52,12 @@ class UIModule:
 		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
 		self.position = position
 class CalendarModule(UIModule):
-	def __init__(self, size, position, updateSeconds):
-		super().__init__(size, position, updateSeconds)
+	def __init__(self, size, position, updateSeconds, updateFunc):
+		super().__init__(size, position, updateSeconds, updateFunc)
 		self.events = []
 	def update(self, func):
 		if self.checkUpdate():
-			evs = func(5)
+			evs = self.updateFunc()
 			self.events = []
 			for ev in evs:
 				self.events.append(ev.toTuple())
@@ -139,14 +142,14 @@ class CalendarModule(UIModule):
 				
 		screen.blit(background, self.position)
 class WeatherModule(UIModule):
-	def __init__(self, size, position, updateSeconds):
+	def __init__(self, size, position, updateSeconds, updateFunc):
 		assert(type(size) is tuple and len(size) == 2 and size[0] == size[1])
-		super().__init__(size, position, updateSeconds)
+		super().__init__(size, position, updateSeconds, updateFunc)
 		self.temperature = None
 		self.meteo = None
-	def update(self, func):
+	def update(self):
 		if self.checkUpdate():
-			infos = func()
+			infos = self.updateFunc()
 			t = infos.toTuple()
 			self.temperature = t[0]
 			self.meteo = t[1]
@@ -192,7 +195,7 @@ class WeatherModule(UIModule):
 		screen.blit(background, self.position)
 class ClockModule(UIModule):
 	def __init__(self, size, position, updateSeconds):
-		super().__init__(size, position, updateSeconds)
+		super().__init__(size, position, updateSeconds, 'No func!')
 		self.points = True
 	def update(self):
 		if self.checkUpdate():
@@ -221,12 +224,12 @@ class ClockModule(UIModule):
 
 		screen.blit(background, self.position)
 class EmailModule(UIModule):
-	def __init__(self, size, position, updateSeconds):
-		super().__init__(size, position, updateSeconds)
+	def __init__(self, size, position, updateSeconds, updateFunc):
+		super().__init__(size, position, updateSeconds, updateFunc)
 		self.emails = []
-	def update(self, func):
+	def update(self):
 		if self.checkUpdate():
-			ms = func(5)
+			ms = self.updateFunc()
 			self.emails = []
 			for m in ms:
 				self.emails.append(m.toTuple())

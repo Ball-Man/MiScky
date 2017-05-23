@@ -8,8 +8,7 @@ import GoogleAPI.calendar as gcal
 
 uic.init()
 
-cmod = CalendarModule((500,500), (0,0), 5)
-cmod.update(gcal.getEvents)
+cmod = CalendarModule((500,500), (0,0), 5, gcal.getEvents)
 #cmod.events = (('fuffa', '14:00', '14:30', '10/11/2016'),('pippo', '18:00', '20:00', '10/11/2016'), ('roba', '16:00', '17:00', '12/11/2016'), ('altra robazza', '03:00', '04:00', '12/12/2016'))
 uic.addModule(cmod)
 
