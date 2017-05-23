@@ -57,7 +57,7 @@ def main():
 	rpc = zerorpc.Server(RPCListener())
 	rpc.bind('tcp://0.0.0.0:1080')
 	
-	thread = new Thread(target = rpc.run)
+	thread = Thread(target = rpc.run)
 	thread.start()
 	
 	modulesID = []
