@@ -3,12 +3,15 @@ from UIController.modules import *
 import GoogleAPI.calendar as gcal
 import GoogleAPI.gmail as gmail
 import WeatherAPI as wapi
+import CameraController as cam
+import CameraController.facedetection as fdetect
 import pygame
 import time
 import datetime
 
 SLEEP_TIME = 1
 CITY = 'Cesena'
+CAMERA_ROTATION = 0
 _started_time = datetime.datetime.now()
 
 def checkKey():
@@ -21,13 +24,17 @@ def getModulePositions():
 	pos = {'calendar': (500,600), 'email': (500,50), 'weather': (50,300), 'clock': (50,50)}
 	return pos
 
+_standby = True
 def shouldStandby():
-	global _started_time
-	return (datetime.datetime.now() - _started_time).total_seconds() <= 10
+	global _standby
+	if fdetect.facePresent():
+		_standby = False
+	return _standby
 
 def main():
 	uic.init()
 	wapi.init(CITY)
+	cam.init(rotation=CAMERA_ROTATION)
 
 	modules = []
 
