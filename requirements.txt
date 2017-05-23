@@ -3,3 +3,5 @@ google-api-python-client
 pygame
 pyowm
 python-dateutil
+opencv-python
+picamera
