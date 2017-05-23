@@ -150,7 +150,7 @@ class WeatherModule(UIModule):
 			t = infos.toTuple()
 			self.temperature = t[0]
 			self.meteo = t[1]
-	def render(self):
+	def render(self, screen):
 		size = self.size
 		meteo = self.meteo
 		
@@ -220,49 +220,57 @@ class ClockModule(UIModule):
 		background.blit(second, (0,size[1]/1.4))
 
 		screen.blit(background, self.position)
-class MailModule(UIModule):
+class EmailModule(UIModule):
 	def __init__(self, size, position, updateSeconds):
 		super().__init__(size, position, updateSeconds)
-		self.mails = []
+		self.emails = []
 	def update(self, func):
 		if self.checkUpdate():
-			#chiama funzione e assegna attributi
 			ms = func(5)
-			self.mails = []
+			self.emails = []
 			for m in ms:
-				self.mails.append(m.toTuple())
+				self.emails.append(m.toTuple())
 	def render(self, screen):
 		size = self.size
-		mails = self.mails
+		emails = self.emails
 
 		now = dt.datetime.now()
 
-		headerH = size[1]//9
+		headerH = size[1]//7
 		headerPadding = size[1]//62.5
 		headerTextSizeSmall = int(size[1]//38.46)
-		headerTextSizeBig = int(size[1]//25)
+		headerTextSizeBig = int(size[1]//20)
 
 		header = Rectangle(size[0], headerH, RED).render(0)
 		pia = Text('Posta in arrivo', headerTextSizeBig, WHITE).render()
 		header.blit(pia, (headerPadding, headerPadding))
+
+		dateFont = 'Raleway/Raleway-SemiBold.ttf'
+		dateTextSize = int(size[1]//38.46)
+		dateTextPadding = int(size[0]//1.25)
 
 		eventFont = 'Raleway/Raleway-SemiBold.ttf'
 		eventTextSizeBig = int(size[1]//29.41)
 		eventTextSizeSmall = int(size[1]//38.46)
 		eventPadding = size[1]//50
 		eventW = size[0]
-		eventH = size[1]//8
+		eventH = (size[1] - headerH)//5 - 1
 		event = Rectangle(eventW, eventH, WHITE).render()
 		events = []
-		for m in self.mails:
-			tmpMail = event.copy()
+		for m in self.emails:
+			tmpEmail = event.copy()
 			sender = Text(m[0], eventTextSizeBig, BLACK, eventFont).render()
-			subject = Text(m[1], eventTextSizeSmall, BLACK).render()
+			subject = Text('Oggetto: ' + m[1], eventTextSizeSmall, BLACK).render()
+			if now.year == m[2].year and now.month == m[2].month and now.day == m[2].day:
+				date = Text(m[2].strftime('%H:%M'), dateTextSize, BLUE, dateFont).render()
+			else:
+				date = Text(m[2].strftime('%d %b'), dateTextSize, BLUE, dateFont).render()
 			subjectRect = subject.get_rect()
 			subjectRect.bottomleft = (eventPadding, eventH - eventPadding)
-			tmpMail.blit(sender, (eventPadding, eventPadding))
-			tmpMail.blit(subject, subjectRect)
-			events.append(tmpMail)
+			tmpEmail.blit(sender, (eventPadding, eventPadding))
+			tmpEmail.blit(subject, subjectRect)
+			tmpEmail.blit(date, (dateTextPadding, eventPadding))
+			events.append(tmpEmail)
 
 		eventMargin = 2
 		background = Rectangle(size[0], size[1], GREY).render()
