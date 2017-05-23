@@ -5,9 +5,11 @@ import GoogleAPI.gmail as gmail
 import WeatherAPI as wapi
 import pygame
 import time
+import datetime
 
 SLEEP_TIME = 1
 CITY = 'Cesena'
+_started_time = datetime.datetime.now()
 
 def checkKey():
 	for e in pygame.event.get():
@@ -18,6 +20,10 @@ def checkKey():
 def getModulePositions():
 	pos = {'calendar': (500,600), 'email': (500,50), 'weather': (50,300), 'clock': (50,50)}
 	return pos
+
+def shouldStandby():
+	global _started_time
+	return (datetime.datetime.now() - _started_time).total_seconds() <= 10
 
 def main():
 	uic.init()
@@ -38,9 +44,13 @@ def main():
 
 	while not checkKey():
 		# Update all modules
-		for m in modules:
-			m.update()
-		uic.refresh()
+		if not shouldStandby():
+			for m in modules:
+				m.update()
+			uic.refresh()
+		else:
+			uic.standby()
+
 		time.sleep(SLEEP_TIME)
 
 if __name__ == '__main__':
