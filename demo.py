@@ -1,88 +1,47 @@
 import UIController as uic
+from UIController.modules import *
 import GoogleAPI.calendar as gcal
+import GoogleAPI.gmail as gmail
 import WeatherAPI as wapi
 import pygame
 import time
-import zerorpc
-from threading import Thread
 
-def waitForKey():
-	stop = False
-	while not stop:
-		for e in pygame.event.get():
-			if e.type == pygame.KEYDOWN:
-				stop = True
-				break
-		time.sleep(0.1)
+SLEEP_TIME = 1
+CITY = 'Cesena'
 
-	pygame.quit()
+def checkKey():
+	for e in pygame.event.get():
+		if e.type == pygame.KEYDOWN and e.key == pygame.K_LEFT:
+			return True
+	return False
 
-def createCalendar():
-	events = gcal.getEvents(count=5)
+def getModulePositions():
+	pos = {'calendar': (500,600), 'email': (500,50), 'weather': (50,300), 'clock': (50,50)}
+	return pos
 
-	moduleType = 'Calendar'
-	size = (500,700)
-	events = [x.toTuple() for x in events]
-	position = (500,50)
-
-	m1 = uic.addModule(moduleType, size, events, position)
-	return m1
-
-def createWeather():
-	moduleType = 'Weather'
-	size = (300,300)
-	today = wapi.todayWeather().toTuple()
-	position = (50,500)
-
-	m2 = uic.addModule(moduleType, size, today, position)
-	return m2
-
-def createClock():
-	moduleType = 'Clock'
-	size = (300,210)
-	events = ()
-	position = (50,50)
-
-	m3 = uic.addModule(moduleType, size, events, position)
-	return m3
-
-
-class RPCListener(object):
-	def refresh(self):
-		uic.refresh()
-	
 def main():
 	uic.init()
-	wapi.init('Cesena')
-	rpc = zerorpc.Server(RPCListener())
-	rpc.bind('tcp://0.0.0.0:1080')
-	
-	thread = Thread(target = rpc.run)
-	thread.start()
-	
-	modulesID = []
+	wapi.init(CITY)
 
-	stop = False
-	while not stop:
-		for modID in modulesID:
-			uic.removeModule(modID)
-		
-		modulesID = []
+	modules = []
 
-		m1 = createCalendar()
-		modulesID.append(m1)
-		m2 = createWeather()
-		modulesID.append(m2)
-		m3 = createClock()
-		modulesID.append(m3)
+	# Modules creation
+	pos = getModulePositions()
+	modules.append(CalendarModule((500,500), pos['calendar'], 29, gcal.getEvents))
+	uic.addModule(modules[-1])
+	modules.append(EmailModule((500,500), pos['email'], 37, gmail.get_unread))
+	uic.addModule(modules[-1])
+	modules.append(WeatherModule((300,300), pos['weather'], 100, wapi.todayWeather))
+	uic.addModule(modules[-1])
+	modules.append(ClockModule((300,210), pos['clock'], 1))
+	uic.addModule(modules[-1])
+
+	while not checkKey():
+		# Update all modules
+		for m in modules:
+			m.update()
 		uic.refresh()
-		
-		for e in pygame.event.get():
-			if e.type == pygame.KEYDOWN:
-				stop = True
-				break
-		time.sleep(5)
+		time.sleep(SLEEP_TIME)
 
-	pygame.quit()
-
-main()
+if __name__ == '__main__':
+	main()
