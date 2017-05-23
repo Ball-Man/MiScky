@@ -6,12 +6,14 @@ import datetime as dt
 
 class UIModule:
 	_nextId = 0
-	def __init__(self, size, position):
+	def __init__(self, size, position, updateSeconds):
 		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
 		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
 		self.size = size
 		self.position = position
 		self.stop_updating = False
+		self.updateSeconds = updateSeconds
+		self.lastUpdate = dt.datetime.min
 		self.ID = UIModule._nextId
 		UIModule._nextId += 1
 	def render(self, screen):
@@ -21,6 +23,14 @@ class UIModule:
 		background = back.render()
 		background.blit(text.render(), (0,0))
 		screen.blit(background, self.position)
+	def checkUpdate(self):
+		now = dt.datetime.now()
+		sec = (now - self.lastUpdate).total_seconds()
+		res = False
+		if sec >= self.updateSeconds:
+			res = True
+			self.lastUpdate = dt.datetime.now()
+		return res
 	def update(self, func):
 		pass
 	def startAutoUpdate(self, func, seconds):
@@ -39,14 +49,15 @@ class UIModule:
 		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
 		self.position = position
 class CalendarModule(UIModule):
-	def __init__(self, size, position):
-		super().__init__(size, position)
+	def __init__(self, size, position, updateSeconds):
+		super().__init__(size, position, updateSeconds)
 		self.events = []
 	def update(self, func):
-		evs = func(5)
-		self.events = []
-		for ev in evs:
-			self.events.append(ev.toTuple())
+		if self.checkUpdate():
+			evs = func(5)
+			self.events = []
+			for ev in evs:
+				self.events.append(ev.toTuple())
 	def render(self, screen):
 		size = self.size
 		
@@ -128,16 +139,17 @@ class CalendarModule(UIModule):
 				
 		screen.blit(background, self.position)
 class WeatherModule(UIModule):
-	def __init__(self, size, position):
+	def __init__(self, size, position, updateSeconds):
 		assert(type(size) is tuple and len(size) == 2 and size[0] == size[1])
-		super().__init__(size, position)
+		super().__init__(size, position, updateSeconds)
 		self.temperature = None
 		self.meteo = None
 	def update(self, func):
-		infos = func()
-		t = infos.toTuple()
-		self.temperature = t[0]
-		self.meteo = t[1]
+		if self.checkUpdate():
+			infos = func()
+			t = infos.toTuple()
+			self.temperature = t[0]
+			self.meteo = t[1]
 	def render(self):
 		size = self.size
 		meteo = self.meteo
@@ -179,11 +191,12 @@ class WeatherModule(UIModule):
 
 		screen.blit(background, self.position)
 class ClockModule(UIModule):
-	def __init__(self, size, position):
-		super().__init__(size, position)
+	def __init__(self, size, position, updateSeconds):
+		super().__init__(size, position, updateSeconds)
 		self.points = True
 	def update(self):
-		self.points = not self.points
+		if self.checkUpdate():
+			self.points = not self.points
 	def render(self, screen):
 		size = self.size
 		now = dt.datetime.now()
@@ -205,5 +218,57 @@ class ClockModule(UIModule):
 		background = Rectangle(size[0], size[1], BLACK).render()
 		background.blit(hour, (0,0))
 		background.blit(second, (0,size[1]/1.4))
+
+		screen.blit(background, self.position)
+class MailModule(UIModule):
+	def __init__(self, size, position, updateSeconds):
+		super().__init__(size, position, updateSeconds)
+		self.mails = []
+	def update(self, func):
+		if self.checkUpdate():
+			#chiama funzione e assegna attributi
+			ms = func(5)
+			self.mails = []
+			for m in ms:
+				self.mails.append(m.toTuple())
+	def render(self, screen):
+		size = self.size
+		mails = self.mails
+
+		now = dt.datetime.now()
+
+		headerH = size[1]//9
+		headerPadding = size[1]//62.5
+		headerTextSizeSmall = int(size[1]//38.46)
+		headerTextSizeBig = int(size[1]//25)
+
+		header = Rectangle(size[0], headerH, RED).render(0)
+		pia = Text('Posta in arrivo', headerTextSizeBig, WHITE).render()
+		header.blit(pia, (headerPadding, headerPadding))
+
+		eventFont = 'Raleway/Raleway-SemiBold.ttf'
+		eventTextSizeBig = int(size[1]//29.41)
+		eventTextSizeSmall = int(size[1]//38.46)
+		eventPadding = size[1]//50
+		eventW = size[0]
+		eventH = size[1]//8
+		event = Rectangle(eventW, eventH, WHITE).render()
+		events = []
+		for m in self.mails:
+			tmpMail = event.copy()
+			sender = Text(m[0], eventTextSizeBig, BLACK, eventFont).render()
+			subject = Text(m[1], eventTextSizeSmall, BLACK).render()
+			subjectRect = subject.get_rect()
+			subjectRect.bottomleft = (eventPadding, eventH - eventPadding)
+			tmpMail.blit(sender, (eventPadding, eventPadding))
+			tmpMail.blit(subject, subjectRect)
+			events.append(tmpMail)
+
+		eventMargin = 2
+		background = Rectangle(size[0], size[1], GREY).render()
+		background.blit(header, (0,0))
+		for i in range(len(events)):
+			ev = events[i]
+			background.blit(ev, (0, headerH+i*(eventH+eventMargin)))
 
 		screen.blit(background, self.position)
