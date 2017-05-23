@@ -6,19 +6,64 @@ import datetime as dt
 
 class UIModule:
 	_nextId = 0
-	def __init__(self, size):
+	def __init__(self, size, position, updateSeconds, updateFunc):
+		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
+		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
 		self.size = size
+		self.position = position
+		self.stop_updating = False
+		self.updateSeconds = updateSeconds
+		self.lastUpdate = dt.datetime.min
+		self.updateFunc = updateFunc
 		self.ID = UIModule._nextId
 		UIModule._nextId += 1
-	def render(self):
+	def render(self, screen):
 		name = type(self).__name__
-		text = Text('{} with id {}'.format(name, self.ID), 20, WHITE)
+		text = Text('{} with id {}'.format(name, self.ID), 10, BLACK)
+		back = Rect(self.size[0], self.size[1], WHITE)
+		background = back.render()
+		background.blit(text.render(), (0,0))
+		screen.blit(background, self.position)
+	def checkUpdate(self):
+		now = dt.datetime.now()
+		sec = (now - self.lastUpdate).total_seconds()
+		res = False
+		if sec >= self.updateSeconds:
+			res = True
+			self.lastUpdate = dt.datetime.now()
+		return res
+	def update(self, func):
+		pass
+	'''
+	def startAutoUpdate(self, func, seconds):
+		async def autoUpdate(foo, s):
+			while not self.stop_updating:
+				self.update(foo)
+				await asyncio.sleep(s)
+		self.stop_updating = False
+		autoUpdate(func, seconds)
+	def stopAutoUpdate(self):
+		self.stop_updating = True
+	'''
+	def setSize(self, size):
+		assert(type(size) is tuple and len(size) == 2 and all(map(lambda x: type(x) is int, size)))
+		self.size = size
+	def setPosition(self, position):
+		assert(type(position) is tuple and len(position) == 2 and all(map(lambda x: type(x) is int, position)))
+		self.position = position
 class CalendarModule(UIModule):
-	def __init__(self, size, events):
-		super().__init__(size)
-		self.events = events
-	def render(self):
+	def __init__(self, size, position, updateSeconds, updateFunc):
+		super().__init__(size, position, updateSeconds, updateFunc)
+		self.events = []
+	def update(self):
+		if self.checkUpdate():
+			evs = self.updateFunc(6)
+			self.events = []
+			for ev in evs:
+				self.events.append(ev.toTuple())
+	def render(self, screen):
 		size = self.size
+		
 		now = dt.datetime.now()
 
 		headerH = size[1]//9
@@ -95,17 +140,20 @@ class CalendarModule(UIModule):
 				background.blit(dateNumber, (eventMargin, headerH+i*(eventH+eventMargin)+eventMargin))
 				background.blit(dateDay, (eventMargin, headerH+i*(eventH+eventMargin)+eventMargin+dateNumberH))
 				
-
-		return background
+		screen.blit(background, self.position)
 class WeatherModule(UIModule):
-	def __init__(self, size, events):
+	def __init__(self, size, position, updateSeconds, updateFunc):
 		assert(type(size) is tuple and len(size) == 2 and size[0] == size[1])
-		assert(type(events[0]) is int)
-		assert(type(events[1]) is str)
-		super().__init__(size)
-		self.temperature = events[0]
-		self.meteo = events[1]
-	def render(self):
+		super().__init__(size, position, updateSeconds, updateFunc)
+		self.temperature = None
+		self.meteo = None
+	def update(self):
+		if self.checkUpdate():
+			infos = self.updateFunc()
+			t = infos.toTuple()
+			self.temperature = t[0]
+			self.meteo = t[1]
+	def render(self, screen):
 		size = self.size
 		meteo = self.meteo
 		
@@ -144,20 +192,22 @@ class WeatherModule(UIModule):
 		background.blit(meteoSurf, (meteoX, meteoY))
 		background.blit(tempSurf, (0,0))
 
-		return background
+		screen.blit(background, self.position)
 class ClockModule(UIModule):
-	_points = True
-	def __init__(self, size):
-		super().__init__(size)
-	def render(self):
+	def __init__(self, size, position, updateSeconds):
+		super().__init__(size, position, updateSeconds, 'No func!')
+		self.points = True
+	def update(self):
+		if self.checkUpdate():
+			self.points = not self.points
+	def render(self, screen):
 		size = self.size
 		now = dt.datetime.now()
 		s = ''
-		if ClockModule._points:
+		if self.points:
 			s = '%H:%M'
 		else:
 			s = '%H %M'
-		ClockModule._points = not ClockModule._points
 		firstText = now.strftime(s)
 		secondText = now.strftime('%d %a %b %Y')
 		scaleFactor = math.sqrt(size[0]*size[0] + size[1]*size[1])
@@ -171,4 +221,68 @@ class ClockModule(UIModule):
 		background = Rectangle(size[0], size[1], BLACK).render()
 		background.blit(hour, (0,0))
 		background.blit(second, (0,size[1]/1.4))
-		return background
+
+		screen.blit(background, self.position)
+class EmailModule(UIModule):
+	def __init__(self, size, position, updateSeconds, updateFunc):
+		super().__init__(size, position, updateSeconds, updateFunc)
+		self.emails = []
+	def update(self):
+		if self.checkUpdate():
+			ms = self.updateFunc(5)
+			self.emails = []
+			for m in ms:
+				self.emails.append(m.toTuple())
+	def render(self, screen):
+		size = self.size
+		emails = self.emails
+
+		now = dt.datetime.now()
+
+		headerH = size[1]//7
+		headerPadding = size[1]//62.5
+		headerTextSizeSmall = int(size[1]//38.46)
+		headerTextSizeBig = int(size[1]//20)
+
+		header = Rectangle(size[0], headerH, RED).render(0)
+		pia = Text('Posta in arrivo', headerTextSizeBig, WHITE).render()
+		header.blit(pia, (headerPadding, headerPadding))
+
+		dateFont = 'Raleway/Raleway-SemiBold.ttf'
+		dateTextSize = int(size[1]//38.46)
+		dateTextPadding = size[0] - 50
+
+		eventFont = 'Raleway/Raleway-SemiBold.ttf'
+		eventTextSizeBig = int(size[1]//29.41)
+		eventTextSizeSmall = int(size[1]//38.46)
+		eventPadding = size[1]//50
+		eventW = size[0]
+		eventH = (size[1] - headerH)//5 - 1
+		event = Rectangle(eventW, eventH, WHITE).render()
+		textRect = Rectangle(size[0] - 55, eventH, WHITE).render()
+		events = []
+		for m in self.emails:
+			tmpEmail = event.copy()
+			tmpTextRect = textRect.copy()
+			sender = Text(m[0], eventTextSizeBig, BLACK, eventFont).render()
+			subject = Text('Oggetto: ' + m[1], eventTextSizeSmall, BLACK).render()
+			if now.year == m[2].year and now.month == m[2].month and now.day == m[2].day:
+				date = Text(m[2].strftime('%H:%M'), dateTextSize, BLUE, dateFont).render()
+			else:
+				date = Text(m[2].strftime('%d %b'), dateTextSize, BLUE, dateFont).render()
+			subjectRect = subject.get_rect()
+			subjectRect.bottomleft = (eventPadding, eventH - eventPadding)
+			tmpTextRect.blit(sender, (eventPadding, eventPadding))
+			tmpTextRect.blit(subject, subjectRect)
+			tmpEmail.blit(tmpTextRect, (0,0))
+			tmpEmail.blit(date, (dateTextPadding, eventPadding))
+			events.append(tmpEmail)
+
+		eventMargin = 2
+		background = Rectangle(size[0], size[1], GREY).render()
+		background.blit(header, (0,0))
+		for i in range(len(events)):
+			ev = events[i]
+			background.blit(ev, (0, headerH+i*(eventH+eventMargin)))
+
+		screen.blit(background, self.position)

@@ -16,6 +16,8 @@ class Email:
 		self.sender = sender
 	def __str__(self):
 		return '[{}] ({}) from {}'.format(self.sentdate, self.subject, self.sender)
+	def toTuple(self):
+		return self.sender, self.subject, self.sentdate
 	@staticmethod
 	def from_api_dict(dictionary):
 		sentdate = datetime.datetime.fromtimestamp(int(dictionary['internalDate'])//1000)
