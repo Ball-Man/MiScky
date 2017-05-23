@@ -31,7 +31,7 @@ clockmod.update()
 uic.addModule(clockmod)
 modules.append(clockmod)
 
-emailmod = EmailModule((700,500), (600,400), 50, gmail.get_unread)
+emailmod = EmailModule((500,500), (600,400), 50, gmail.get_unread)
 now = dt.datetime.now()
 oneday = now - dt.timedelta(1)
 #emailmod.emails = [('Mario rossi', 'prova1', now), ('Luigi Verdi', 'prova2', oneday), ('Mario rossi', 'prova1', oneday), ('Mario rossi', 'prova1', oneday), ('Mario rossi', 'prova1', oneday)]  

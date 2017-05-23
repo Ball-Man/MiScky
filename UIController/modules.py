@@ -259,9 +259,11 @@ class EmailModule(UIModule):
 		eventW = size[0]
 		eventH = (size[1] - headerH)//5 - 1
 		event = Rectangle(eventW, eventH, WHITE).render()
+		textRect = Rectangle(size[0] - 55, eventH, WHITE).render()
 		events = []
 		for m in self.emails:
 			tmpEmail = event.copy()
+			tmpTextRect = textRect.copy()
 			sender = Text(m[0], eventTextSizeBig, BLACK, eventFont).render()
 			subject = Text('Oggetto: ' + m[1], eventTextSizeSmall, BLACK).render()
 			if now.year == m[2].year and now.month == m[2].month and now.day == m[2].day:
@@ -270,8 +272,9 @@ class EmailModule(UIModule):
 				date = Text(m[2].strftime('%d %b'), dateTextSize, BLUE, dateFont).render()
 			subjectRect = subject.get_rect()
 			subjectRect.bottomleft = (eventPadding, eventH - eventPadding)
-			tmpEmail.blit(sender, (eventPadding, eventPadding))
-			tmpEmail.blit(subject, subjectRect)
+			tmpTextRect.blit(sender, (eventPadding, eventPadding))
+			tmpTextRect.blit(subject, subjectRect)
+			tmpEmail.blit(tmpTextRect, (0,0))
 			tmpEmail.blit(date, (dateTextPadding, eventPadding))
 			events.append(tmpEmail)
 
