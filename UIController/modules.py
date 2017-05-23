@@ -55,9 +55,9 @@ class CalendarModule(UIModule):
 	def __init__(self, size, position, updateSeconds, updateFunc):
 		super().__init__(size, position, updateSeconds, updateFunc)
 		self.events = []
-	def update(self, func):
+	def update(self):
 		if self.checkUpdate():
-			evs = self.updateFunc()
+			evs = self.updateFunc(6)
 			self.events = []
 			for ev in evs:
 				self.events.append(ev.toTuple())
@@ -229,7 +229,7 @@ class EmailModule(UIModule):
 		self.emails = []
 	def update(self):
 		if self.checkUpdate():
-			ms = self.updateFunc()
+			ms = self.updateFunc(5)
 			self.emails = []
 			for m in ms:
 				self.emails.append(m.toTuple())
@@ -250,7 +250,7 @@ class EmailModule(UIModule):
 
 		dateFont = 'Raleway/Raleway-SemiBold.ttf'
 		dateTextSize = int(size[1]//38.46)
-		dateTextPadding = int(size[0]//1.25)
+		dateTextPadding = size[0] - 50
 
 		eventFont = 'Raleway/Raleway-SemiBold.ttf'
 		eventTextSizeBig = int(size[1]//29.41)
