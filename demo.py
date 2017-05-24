@@ -33,7 +33,7 @@ def getModulePositions():
 	global _lastPositionRead
 	global _position
 	if (NOW() - _lastPositionRead).total_seconds() > 5:
-		with open('miscky.conf', 'r') as f:
+		with open('/home/mirror/MiScky/miscky.conf', 'r') as f:
 			_position = json.loads(f.read())
 		_lastPositionRead = NOW()
 	return _position
