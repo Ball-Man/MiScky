@@ -13,10 +13,12 @@ import pygame
 import time
 import datetime as dt
 
+NOW = dt.datetime.now
+
 SLEEP_TIME = 1
 CITY = 'Cesena'
 CAMERA_ROTATION = 180
-_started_time = dt.datetime.now()
+_started_time = NOW()
 
 def checkKey():
 	for e in pygame.event.get():
@@ -24,9 +26,14 @@ def checkKey():
 			return True
 	return False
 
+_lastPositionRead = dt.datetime.min
+_position = {'calendar': (500,600), 'email': (500,50), 'weather': (50,300), 'clock': (50,50)}
 def getModulePositions():
-	pos = {'calendar': (500,600), 'email': (500,50), 'weather': (50,300), 'clock': (50,50)}
-	return pos
+	if (NOW() - _lastPositionRead).total_seconds() > 5:
+		with open('miscky.conf', 'r') as f:
+			_position = json.loads(f.read())
+		_lastPositionRead = NOW()
+	return _position
 
 _standby = True
 def shouldStandby():
@@ -36,8 +43,7 @@ def shouldStandby():
 	return _standby
 
 def speak():
-	now = dt.datetime.now()
-	ora = now.strftime('%H e %M minuti')
+	ora = NOW().strftime('%H e %M minuti')
 	s = '.Buongiorno. Sono le {}. Per oggi e previsto: {}'.format(ora, wapi.todayWeather().description)
 	TTS.playTTS(s)
 
