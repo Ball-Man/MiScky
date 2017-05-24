@@ -1,5 +1,5 @@
 import requests
-import audiocontroller
+import AudioController.audiocontroller as audiocontroller
 
 api_url = 'http://api.voicerss.org'
 api_key = '00a395df0b7f48efae665eac2fb49fc9'
