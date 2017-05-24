@@ -7,10 +7,11 @@ camera = None
 def init(rotation = 0):
     #Initialize the camera module. If it's already initialized does nothing
     global camera
-    if rotation not in [0, 90, 180, 360]:
+    if rotation not in [0, 90, 180, 270]:
         raise ValueError('Invalid rotation value')
     if camera == None:
         camera = picamera.PiCamera()
+		camera.rotation = rotation
 
 def getPhoto(resolution=(1920,1080)):
     # Captures a photo with the given resolution and returns it as a io.BytesIO
