@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import UIController as uic
 from UIController.modules import *
 import GoogleAPI.calendar as gcal
@@ -5,14 +7,16 @@ import GoogleAPI.gmail as gmail
 import WeatherAPI as wapi
 import CameraController as cam
 import CameraController.facedetection as fdetect
+import AudioController.audiocontroller as audio
+import AudioController.tts as TTS
 import pygame
 import time
-import datetime
+import datetime as dt
 
 SLEEP_TIME = 1
 CITY = 'Cesena'
 CAMERA_ROTATION = 180
-_started_time = datetime.datetime.now()
+_started_time = dt.datetime.now()
 
 def checkKey():
 	for e in pygame.event.get():
@@ -31,10 +35,19 @@ def shouldStandby():
 		_standby = False
 	return _standby
 
+def speak():
+	now = dt.datetime.now()
+	ora = now.strftime('%H e %M minuti')
+	s = '.Buongiorno. Sono le {}. Per oggi e previsto: {}'.format(ora, wapi.todayWeather().description)
+	TTS.playTTS(s)
+
+
 def main():
 	uic.init()
 	wapi.init(CITY)
 	cam.init(rotation=CAMERA_ROTATION)
+	audio.init()
+	_hasSpoken = False
 
 	modules = []
 
@@ -51,10 +64,14 @@ def main():
 
 	for m in modules:
 		m.update()
+	
 
 	while not checkKey():
 		# Update all modules
 		if not shouldStandby():
+			if not _hasSpoken:
+				speak()
+				_hasSpoken = True
 			for m in modules:
 				m.update()
 			uic.refresh()
