@@ -29,6 +29,8 @@ def checkKey():
 _lastPositionRead = dt.datetime.min
 _position = {'calendar': (500,600), 'email': (500,50), 'weather': (50,300), 'clock': (50,50)}
 def getModulePositions():
+	global _lastPositionRead
+	global _position
 	if (NOW() - _lastPositionRead).total_seconds() > 5:
 		with open('miscky.conf', 'r') as f:
 			_position = json.loads(f.read())
