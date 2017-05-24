@@ -65,6 +65,8 @@ def main():
 	for m in modules:
 		m.update()
 	
+	TTS.playTTS('.Specchio intelligente pronto. Prego, posizionarsi davanti allo specchio')
+	time.sleep(6)
 
 	while not checkKey():
 		# Update all modules
