@@ -1,12 +1,12 @@
 import pyowm
-import datetime
-NOW = datetime.datetime.now # Just for less writing
+import datetime as dt
+NOW = dt.datetime.now # Just for less writing
 
 owm = None
 forecaster = None
 forecast = None
 city = 'San Antonio'
-last_update = datetime.datetime.fromtimestamp(0)
+last_update = dt.datetime.fromtimestamp(0)
 
 class WeatherForecast:
 	def __init__(self, temperature, status, description):
@@ -14,10 +14,10 @@ class WeatherForecast:
 		self.status = status
 		self.description = description
 	def toTuple(self):
-		return int(self.temperature['day']), self.status
+		return self.temperature, self.status
 	@staticmethod
 	def fromAPI(apiobj):
-		return WeatherForecast(apiobj.get_temperature(unit='celsius'), apiobj.get_status(), apiobj.get_detailed_status())
+		return WeatherForecast(int(apiobj.get_temperature(unit='celsius')['temp']), apiobj.get_status(), apiobj.get_detailed_status())
 
 def init(place):
 	global owm
@@ -33,7 +33,8 @@ def todayWeather():
 
 def tomorrowWeather():
 	refresh()
-	return WeatherForecast.fromAPI(forecast.get_weathers()[1])
+	tomorrow = dt.datetime.today() + dt.timedelta(days=1)
+	return WeatherForecast.fromAPI(forecaster.get_weather_at(tomorrow))
 
 def refresh():
 	global forecaster
@@ -41,6 +42,6 @@ def refresh():
 	global last_update
 
 	if (NOW() - last_update).total_seconds() > 3600: # If we updated more than 1 hour ago
-		forecaster = owm.daily_forecast(city)
+		forecaster = owm.three_hours_forecast(city)
 		forecast = forecaster.get_forecast()
 		last_update = NOW()
