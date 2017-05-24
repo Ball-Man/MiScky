@@ -11,7 +11,7 @@ import datetime
 
 SLEEP_TIME = 1
 CITY = 'Cesena'
-CAMERA_ROTATION = 0
+CAMERA_ROTATION = 180
 _started_time = datetime.datetime.now()
 
 def checkKey():
@@ -27,7 +27,7 @@ def getModulePositions():
 _standby = True
 def shouldStandby():
 	global _standby
-	if fdetect.facePresent():
+	if _standby and fdetect.facePresent():
 		_standby = False
 	return _standby
 
@@ -48,6 +48,9 @@ def main():
 	uic.addModule(modules[-1])
 	modules.append(ClockModule((300,210), pos['clock'], 1))
 	uic.addModule(modules[-1])
+
+	for m in modules:
+		m.update()
 
 	while not checkKey():
 		# Update all modules
