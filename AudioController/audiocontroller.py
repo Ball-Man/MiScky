@@ -4,6 +4,8 @@ import time
 channel = None
 paused = False 
 
+stop_timer = 0.15
+
 def init():
 	global channel
 
@@ -13,7 +15,7 @@ def init():
 def playChannel(raw):
 	channel.set_volume(0)
 	channel.play(mixer.Sound(raw))
-	time.sleep(0.2)
+	time.sleep(stop_timer)
 	channel.set_volume(1)
 	
 def stopChannel():
@@ -50,5 +52,5 @@ def playOver(raw):
 	sound = mixer.Sound(raw)
 	sound.set_volume(0)
 	sound.play()
-	time.sleep(0.2)
+	time.sleep(stop_timer)
 	sound.set_volume(1)
