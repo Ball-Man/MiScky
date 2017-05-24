@@ -1,4 +1,8 @@
-import WeatherAPI
+import WeatherAPI as wapi
 
-WeatherAPI.init('Cesena')
-print(WeatherAPI.todayWeather().status, '\n', WeatherAPI.tomorrowWeather().description)
+wapi.init('Cesena')
+td = wapi.todayWeather()
+tm = wapi.tomorrowWeather()
+
+print(td.toTuple())
+print(tm.toTuple())
