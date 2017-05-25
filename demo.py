@@ -33,8 +33,8 @@ def getModulePositions():
 	global _lastPositionRead
 	global _position
 	if (NOW() - _lastPositionRead).total_seconds() > 5:
-		with open('/home/mirror/MiScky/miscky.conf', 'r') as f:
-			tmp = json.loads(f.read())
+		with open('/home/mirror/MiScky/config.json', 'r') as f:
+			tmp = json.loads(f.read())['modules']
 			_position = dict()
 			for k in tmp:
 				_position[k] = (tmp[k]['X'], tmp[k]['Y'])
@@ -65,13 +65,13 @@ def main():
 
 	# Modules creation
 	pos = getModulePositions()
-	modules.append(CalendarModule((500,500), pos['calendar'], 29, gcal.getEvents))
+	modules.append(CalendarModule((500,500), pos['Calendar'], 29, gcal.getEvents))
 	uic.addModule(modules[-1])
-	modules.append(EmailModule((500,500), pos['email'], 37, gmail.get_unread))
+	modules.append(EmailModule((500,500), pos['Mail'], 37, gmail.get_unread))
 	uic.addModule(modules[-1])
-	modules.append(WeatherModule((300,300), pos['weather'], 100, wapi.todayWeather))
+	modules.append(WeatherModule((300,300), pos['Weather'], 100, wapi.todayWeather))
 	uic.addModule(modules[-1])
-	modules.append(ClockModule((300,210), pos['clock'], 1))
+	modules.append(ClockModule((300,210), pos['Clock'], 1))
 	uic.addModule(modules[-1])
 
 	for m in modules:
@@ -88,6 +88,11 @@ def main():
 				_hasSpoken = True
 			for m in modules:
 				m.update()
+			pos = getModulePositions()
+			modules[0].setPosition(pos['Calendar'])
+			modules[1].setPosition(pos['Mail'])
+			modules[2].setPosition(pos['Weather'])
+			modules[3].setPosition(pos['Clock'])
 			uic.refresh()
 		else:
 			uic.standby()
